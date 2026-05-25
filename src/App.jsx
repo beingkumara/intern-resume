@@ -108,7 +108,7 @@ async function callPolish(text) {
         body: JSON.stringify({
             model: HF_MODEL,
             messages: [
-                { role: "system", content: "You are an expert resume writer. Polish the given resume text to be more impactful, action-oriented, quantifiable, and ATS-friendly. Ensure the output is extremely concise and fits entirely on a single line without overflowing. Return ONLY the polished text. No quotes, no preamble, no explanation." },
+                { role: "system", content: "You are an expert resume writer. Polish the given resume text to be more impactful, action-oriented, quantifiable, and ATS-friendly. STRICT CONSTRAINT: Limit the output to a maximum of 15 words. Ensure it fits entirely on a single line. Return ONLY the polished text. No quotes, no preamble, no explanation." },
                 { role: "user", content: text },
             ],
             max_tokens: 300,
