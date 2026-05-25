@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import { useUser, useAuth, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
@@ -108,7 +108,7 @@ async function callPolish(text) {
         body: JSON.stringify({
             model: HF_MODEL,
             messages: [
-                { role: "system", content: "You are an expert resume writer. Polish the given resume text to be more impactful, action-oriented, quantifiable, and ATS-friendly. STRICT CONSTRAINT: Limit the output to a maximum of 15 words. Ensure it fits entirely on a single line. Return ONLY the polished text. No quotes, no preamble, no explanation." },
+                { role: "system", content: "You are an expert resume writer. Polish the given resume text to be more impactful, action-oriented, quantifiable, and ATS-friendly. Return ONLY the polished text. No quotes, no preamble, no explanation." },
                 { role: "user", content: text },
             ],
             max_tokens: 300,
@@ -219,7 +219,7 @@ function BulletRow({ value, onChange, onRemove, pKey, ps, setPs, rows = 2 }) {
 
 // ─── Resume Preview ───────────────────────────────────────────────────────────
 const CM = "'Computer Modern', 'CMU Serif', 'Latin Modern Roman', Georgia, 'Times New Roman', serif";
-const PT = "9.5pt";
+const PT = "var(--pt, 9.5pt)";
 
 // ── Shared indent constants matching LaTeX \hspace{1em} and leftmargin=2.5em ──
 const INDENT = "1em";       // entry title left offset  (matches \hspace{1em})
@@ -229,13 +229,13 @@ const secStyle = {
     fontFamily: CM, fontSize: PT, fontWeight: "bold",
     textTransform: "uppercase",
     borderBottom: "0.5pt solid #000",
-    marginBottom: "4pt", marginTop: "6pt", paddingBottom: "1pt",
+    marginBottom: "0.42em", marginTop: "0.63em", paddingBottom: "0.1em",
     letterSpacing: "0.2px", color: "#000",
 };
 
 // Shared <ul> style — identical for EVERY bullet list in the resume
 const ulStyle = {
-    margin: "2pt 0 4pt 0",
+    margin: "0.21em 0 0.42em 0",
     paddingLeft: BULLET_LEFT,
     fontFamily: CM,
     fontSize: PT,
@@ -245,13 +245,13 @@ const ulStyle = {
     textAlign: "left",
 };
 
-const liStyle = { marginBottom: "1.5pt", paddingLeft: "0.1em" };
+const liStyle = { marginBottom: "0.16em", paddingLeft: "0.1em" };
 
 function REntry({ title, period, isProject = false, github = "" }) {
     return (
         <div style={{
             display: "flex", justifyContent: "space-between", alignItems: "baseline",
-            paddingLeft: INDENT, marginTop: "3pt", marginBottom: "0pt",
+            paddingLeft: INDENT, marginTop: "0.32em", marginBottom: "0pt",
             fontFamily: CM, fontSize: PT, textAlign: "left",
         }}>
             <span style={{ fontWeight: "bold" }}>
@@ -287,20 +287,38 @@ function Preview({ d }) {
     const { skills } = d;
     const hasSkills = skills.languages || skills.frameworks || skills.tools || skills.databases;
 
+    const [fontSize, setFontSize] = useState(9.5);
+    const containerRef = useRef(null);
+
+    useLayoutEffect(() => {
+        setFontSize(9.5);
+    }, [d]);
+
+    useLayoutEffect(() => {
+        if (!containerRef.current) return;
+        const el = containerRef.current;
+        if (el.scrollHeight > el.clientHeight && fontSize > 6) {
+            setFontSize(prev => parseFloat((prev - 0.1).toFixed(1)));
+        }
+    }, [fontSize, d]);
+
     return (
-        <div id="resume-preview" style={{
-            width: "210mm", minHeight: "297mm",
+        <div id="resume-preview" ref={containerRef} style={{
+            "--pt": `${fontSize}pt`,
+            "--name-pt": `${fontSize * 1.47}pt`,
+            width: "210mm", height: "297mm",
             padding: "0.45in 0.5in 0.38in 0.5in",
             background: "white", color: "#000",
             fontFamily: CM, fontSize: PT, lineHeight: 1.25,
             boxSizing: "border-box",
             textAlign: "left",
+            overflow: "hidden"
         }}>
 
             {/* ── Header ── */}
-            <div style={{ position: "relative", marginBottom: "4pt" }}>
+            <div style={{ position: "relative", marginBottom: "0.42em" }}>
                 <div className="center" style={{ textAlign: "center" }}>
-                    <div style={{ fontFamily: CM, fontSize: "14pt", fontWeight: "bold", marginBottom: "2pt", color: "#000" }}>
+                    <div style={{ fontFamily: CM, fontSize: "var(--name-pt, 14pt)", fontWeight: "bold", marginBottom: "0.21em", color: "#000" }}>
                         {d.header.name || "YOUR NAME"}
                     </div>
                     <div style={{ fontFamily: CM, fontSize: PT, color: "#000" }}>
