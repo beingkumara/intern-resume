@@ -559,8 +559,9 @@ export default function App() {
         style.textContent = `
       @media print {
         .no-print { display: none !important; }
-        body { margin: 0 !important; background: white !important; }
-        #resume-preview { box-shadow: none !important; margin: 0 !important; }
+        html, body, #root { margin: 0 !important; padding: 0 !important; background: white !important; height: auto !important; overflow: visible !important; }
+        .print-reset, .print-reset > div { display: block !important; height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; background: transparent !important; box-shadow: none !important; }
+        #resume-preview { box-shadow: none !important; margin: 0 !important; width: 210mm !important; }
       }
       @page { size: A4; margin: 0; }
       textarea:focus, input:focus { border-color: #7c3aed !important; box-shadow: 0 0 0 2px rgba(124,58,237,0.15) !important; }
@@ -603,7 +604,7 @@ export default function App() {
     }
 
     return (
-        <div style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
+        <div className="print-reset" style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
 
             {/* ── Top Bar ── */}
             <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 18px", background: "#060c18", borderBottom: "1px solid #1e293b", flexShrink: 0, zIndex: 10 }}>
@@ -630,7 +631,7 @@ export default function App() {
             </div>
 
             {/* ── Body ── */}
-            <div style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+            <div className="print-reset" style={{ flex: 1, display: "flex", overflow: "hidden" }}>
 
                 {/* ── Form Panel ── */}
                 {showForm && (
@@ -739,8 +740,8 @@ export default function App() {
                 )}
 
                 {/* ── Preview Panel ── */}
-                <div style={{ flex: 1, background: "#1e2433", overflowY: "auto", display: "flex", justifyContent: "center", padding: 24, alignItems: "flex-start" }}>
-                    <div style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.6)", flexShrink: 0 }}>
+                <div className="print-reset" style={{ flex: 1, background: "#1e2433", overflowY: "auto", display: "flex", justifyContent: "center", padding: 24, alignItems: "flex-start" }}>
+                    <div className="print-reset" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.6)", flexShrink: 0 }}>
                         <Preview d={d} />
                     </div>
                 </div>
