@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useUser, useAuth, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct";
@@ -306,8 +307,8 @@ function Preview({ d }) {
                         {[
                             d.header.id,
                             d.header.institution,
-                            d.header.linkedin && <a href={toAbsUrl(d.header.linkedin)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>{d.header.linkedin.replace(/^https?:\/\/(www\.)?/, '')}</a>,
-                            d.header.github && <a href={toAbsUrl(d.header.github)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>{d.header.github.replace(/^https?:\/\/(www\.)?/, '')}</a>
+                            d.header.linkedin && <a href={toAbsUrl(d.header.linkedin)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>linkedin</a>,
+                            d.header.github && <a href={toAbsUrl(d.header.github)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>github</a>
                         ].filter(Boolean).map((item, idx, arr) => (
                             <span key={idx}>
                                 {item}
@@ -401,6 +402,147 @@ function Preview({ d }) {
     );
 }
 
+function ProfileSync({ d, setD }) {
+    const { user } = useUser();
+    const { getToken } = useAuth();
+    const [isLoading, setIsLoading] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
+
+    if (!user) return null;
+
+    const handleSave = async () => {
+        setIsSaving(true);
+        try {
+            const token = await getToken();
+            const res = await fetch("/api/profile", {
+                method: "PATCH",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    name: d.header.name,
+                    rollNumber: d.header.id,
+                    linkedin: d.header.linkedin,
+                    github: d.header.github,
+                    experiences: d.experience.map(exp => {
+                        const idx = exp.title.indexOf("—");
+                        const company = idx !== -1 ? exp.title.slice(0, idx).trim() : exp.title;
+                        const role = idx !== -1 ? exp.title.slice(idx + 1).trim() : "";
+                        const pIdx = exp.period.indexOf("-");
+                        const startDate = pIdx !== -1 ? exp.period.slice(0, pIdx).trim() : exp.period;
+                        const endDate = pIdx !== -1 ? exp.period.slice(pIdx + 1).trim() : "";
+                        return { company, role, startDate, endDate, bullets: exp.bullets };
+                    }),
+                    educations: d.education.map(edu => ({
+                        degree: edu.program,
+                        institution: edu.institution,
+                        gpa: edu.cgpa,
+                        startDate: edu.year,
+                        endDate: edu.year
+                    })),
+                    achievements: d.achievements,
+                    projects: d.projects.map(proj => ({
+                        name: proj.title,
+                        github: proj.github,
+                        startDate: proj.period,
+                        bullets: proj.bullets
+                    })),
+                    coursework: d.coursework,
+                    responsibilities: d.positions.map(pos => ({
+                        name: pos.title,
+                        startDate: pos.period,
+                        bullets: pos.bullets
+                    })),
+                    cocurriculars: d.cocurricular,
+                    skills: d.skills
+                })
+            });
+            if (!res.ok) throw new Error("Failed to save profile");
+            alert("Master Profile saved successfully!");
+        } catch (e) {
+            console.error(e);
+            alert("Failed to save profile: " + e.message);
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleLoad = async () => {
+        setIsLoading(true);
+        try {
+            const token = await getToken();
+            const res = await fetch("/api/profile", {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error("Failed to load profile");
+            const profile = await res.json();
+            
+            setD(prev => ({
+                ...prev,
+                header: {
+                    ...prev.header,
+                    name: profile.name || prev.header.name,
+                    id: profile.rollNumber || prev.header.id,
+                    linkedin: profile.linkedin || prev.header.linkedin,
+                    github: profile.github || prev.header.github,
+                },
+                experience: profile.experiences?.length ? profile.experiences.map(exp => ({
+                    title: exp.company && exp.role ? `${exp.company} — ${exp.role}` : (exp.company || exp.role || ""),
+                    period: exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : (exp.startDate || exp.endDate || ""),
+                    bullets: exp.description ? JSON.parse(exp.description) : []
+                })) : prev.experience,
+                education: profile.educations?.length ? profile.educations.map(edu => ({
+                    program: edu.degree || edu.program || "",
+                    institution: edu.institution || "",
+                    cgpa: edu.gpa || "",
+                    year: edu.startDate || edu.endDate || ""
+                })) : prev.education,
+                achievements: profile.achievements?.length ? profile.achievements : prev.achievements,
+                projects: profile.projects?.length ? profile.projects.map(proj => ({
+                    title: proj.name || "",
+                    github: proj.github || "",
+                    period: proj.startDate || proj.endDate || "",
+                    bullets: proj.description ? JSON.parse(proj.description) : []
+                })) : prev.projects,
+                coursework: profile.coursework?.length ? profile.coursework : prev.coursework,
+                positions: profile.responsibilities?.length ? profile.responsibilities.map(resp => ({
+                    title: resp.name || "",
+                    period: resp.startDate || resp.endDate || "",
+                    bullets: resp.description ? JSON.parse(resp.description) : []
+                })) : prev.positions,
+                cocurricular: profile.cocurriculars?.length ? profile.cocurriculars : prev.cocurricular,
+                skills: profile.skills || prev.skills
+            }));
+        } catch (e) {
+            console.error(e);
+            alert("Failed to load profile: " + e.message);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div style={{ background: "rgba(99, 102, 241, 0.1)", border: "1px solid rgba(99, 102, 241, 0.3)", borderRadius: 12, padding: 16, marginBottom: 24, boxShadow: "0 1px 2px 0 rgba(0, 0, 0, 0.05)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <h3 style={{ fontSize: 14, fontWeight: 700, color: "#a5b4fc", margin: 0 }}>Master Profile Sync</h3>
+                <span style={{ background: "rgba(99, 102, 241, 0.2)", color: "#818cf8", fontSize: 10, textTransform: "uppercase", fontWeight: 700, padding: "2px 8px", borderRadius: 9999 }}>Cloud</span>
+            </div>
+            <p style={{ fontSize: 12, color: "#818cf8", marginBottom: 16, lineHeight: 1.5, opacity: 0.8 }}>
+                Save your current details to your account so you can instantly auto-fill future resumes.
+            </p>
+            <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={handleLoad} disabled={isLoading || isSaving} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "rgba(30, 41, 59, 0.8)", color: "#818cf8", border: "1px solid rgba(99, 102, 241, 0.4)", padding: "8px 12px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: (isLoading || isSaving) ? "wait" : "pointer", opacity: (isLoading || isSaving) ? 0.5 : 1 }}>
+                    {isLoading ? "..." : "Load Data"}
+                </button>
+                <button onClick={handleSave} disabled={isLoading || isSaving} style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 8, background: "#4f46e5", color: "white", border: "none", padding: "8px 12px", borderRadius: 8, fontSize: 14, fontWeight: 600, cursor: (isLoading || isSaving) ? "wait" : "pointer", opacity: (isLoading || isSaving) ? 0.5 : 1 }}>
+                    {isSaving ? "..." : "Save Data"}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 // ─── Main App ─────────────────────────────────────────────────────────────────
 export default function App() {
     const [d, setD] = useState(INIT);
@@ -469,6 +611,16 @@ export default function App() {
                     <span style={{ color: "#7c3aed" }}>▣</span> LaTeX Resume Builder
                 </div>
                 <div style={{ flex: 1 }} />
+                
+                <SignedOut>
+                  <SignInButton mode="modal">
+                     <button style={{ padding: "6px 14px", background: "#7c3aed", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Sign In</button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  <UserButton />
+                </SignedIn>
+
                 <button onClick={() => setShowForm(f => !f)} style={{ padding: "6px 14px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
                     {showForm ? "⊟ Hide Form" : "⊞ Show Form"}
                 </button>
@@ -483,7 +635,7 @@ export default function App() {
                 {/* ── Form Panel ── */}
                 {showForm && (
                     <div className="no-print" style={{ width: 430, background: "#0d1424", borderRight: "1px solid #1e293b", overflowY: "auto", padding: "14px 14px 30px", flexShrink: 0 }}>
-
+                        <ProfileSync d={d} setD={setD} />
                         <SCard title="Header">
                             <Inp label="Full Name" value={d.header.name} onChange={v => updH("name", v)} />
                             <Inp label="Roll / Student ID" value={d.header.id} onChange={v => updH("id", v)} />

@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Master Profile linked to Clerk User
+model UserProfile {
+  id          String   @id @default(cuid())
+  userId      String   @unique // Clerk User ID
+  
+  // Base Contact Info
+  name        String?
+  rollNumber  String?
+  linkedin    String?
+  github      String?
+  portfolio   String?
+  summary     String?
+  cocurriculars String[]  @default([])
+  
+  // Additional fields for Placements
+  achievements String[] @default([])
+  coursework   String[] @default([])
+  skills       Json?
+  
+  // Relations to Master Lists
+  experiences MasterExperience[]
+  educations  MasterEducation[]
+  projects    MasterProject[]
+  responsibilities MasterResponsibility[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MasterExperience {
+  id             String      @id @default(cuid())
+  userProfileId  String
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  
+  company        String
+  role           String
+  location       String?
+  startDate      String
+  endDate        String
+  current        Boolean     @default(false)
+  description    String      // Store as JSON string array of bullet points
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model MasterEducation {
+  id             String      @id @default(cuid())
+  userProfileId  String
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  
+  institution    String
+  degree         String
+  field          String
+  location       String?
+  startDate      String
+  endDate        String
+  current        Boolean     @default(false)
+  gpa            String?
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model MasterProject {
+  id             String      @id @default(cuid())
+  userProfileId  String
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  
+  name           String
+  description    String      // Store as JSON string array of bullet points
+  technologies   String      // Comma-separated or JSON
+  startDate      String?
+  endDate        String?
+  link           String?
+  github         String?
+  guide          String?
+  courseName     String?
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
+
+model MasterResponsibility {
+  id             String      @id @default(cuid())
+  userProfileId  String
+  userProfile    UserProfile @relation(fields: [userProfileId], references: [id], onDelete: Cascade)
+  
+  name           String
+  description    String      // Store as JSON string array of bullet points
+  technologies   String      // Comma-separated or JSON
+  startDate      String?
+  endDate        String?
+  link           String?
+  github         String?
+  guide          String?
+  courseName     String?
+  
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+}
