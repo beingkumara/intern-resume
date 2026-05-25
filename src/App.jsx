@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 
-const HF_URL = "https://api-inference.huggingface.co/v1/chat/completions";
+const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct";
 
 const INIT = {
@@ -114,7 +114,10 @@ async function callPolish(text) {
         }),
     });
     const d = await res.json();
-    if (d.error) throw new Error(d.error.message || "HuggingFace API error");
+    if (d.error) {
+        const msg = typeof d.error === 'string' ? d.error : (d.error.message || "HuggingFace API error");
+        throw new Error(msg);
+    }
     return d.choices[0].message.content.trim();
 }
 
