@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import { useUser, useAuth, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import { Analytics } from '@vercel/analytics/react';
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct";
@@ -622,6 +623,7 @@ export default function App() {
     }
 
     return (
+        <>
         <div className="print-reset" style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
 
             {/* ── Top Bar ── */}
@@ -766,5 +768,7 @@ export default function App() {
 
             </div>
         </div>
+        <Analytics />
+        </>
     );
 }
