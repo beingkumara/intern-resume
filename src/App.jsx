@@ -477,7 +477,7 @@ function ProfileSync({ d, setD }) {
             });
             if (!res.ok) throw new Error("Failed to load profile");
             const profile = await res.json();
-            
+
             setD(prev => ({
                 ...prev,
                 header: {
@@ -608,17 +608,17 @@ export default function App() {
             {/* ── Top Bar ── */}
             <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 18px", background: "#060c18", borderBottom: "1px solid #1e293b", flexShrink: 0, zIndex: 10 }}>
                 <div style={{ fontWeight: 800, fontSize: 14, color: "#e2e8f0", letterSpacing: "-0.3px" }}>
-                    <span style={{ color: "#7c3aed" }}>▣</span> LaTeX Resume Builder
+                    <span style={{ color: "#7c3aed" }}>▣</span> Resume-Chesuko
                 </div>
                 <div style={{ flex: 1 }} />
-                
+
                 <SignedOut>
-                  <SignInButton mode="modal">
-                     <button style={{ padding: "6px 14px", background: "#7c3aed", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Sign In</button>
-                  </SignInButton>
+                    <SignInButton mode="modal">
+                        <button style={{ padding: "6px 14px", background: "#7c3aed", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Sign In</button>
+                    </SignInButton>
                 </SignedOut>
                 <SignedIn>
-                  <UserButton />
+                    <UserButton />
                 </SignedIn>
 
                 <button onClick={() => setShowForm(f => !f)} style={{ padding: "6px 14px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
