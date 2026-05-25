@@ -558,10 +558,10 @@ export default function App() {
         const style = document.createElement("style");
         style.textContent = `
       @media print {
-        .no-print { display: none !important; }
         html, body, #root { margin: 0 !important; padding: 0 !important; background: white !important; height: auto !important; overflow: visible !important; }
-        .print-reset, .print-reset > div { display: block !important; height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; background: transparent !important; box-shadow: none !important; }
+        .print-reset { display: block !important; height: auto !important; overflow: visible !important; padding: 0 !important; margin: 0 !important; background: transparent !important; box-shadow: none !important; }
         #resume-preview { box-shadow: none !important; margin: 0 !important; width: 210mm !important; }
+        .no-print { display: none !important; }
       }
       @page { size: A4; margin: 0; }
       textarea:focus, input:focus { border-color: #7c3aed !important; box-shadow: 0 0 0 2px rgba(124,58,237,0.15) !important; }
