@@ -98,22 +98,27 @@ export default function Template2({ d }) {
         }}>
 
             {/* ── Header ── */}
-            <div style={{ textAlign: "center", marginBottom: "0.5em" }}>
-                <div style={{ fontFamily: CM, fontSize: "var(--name-pt, 14pt)", fontWeight: "bold", textTransform: "uppercase", marginBottom: "2pt", color: "#000" }}>
-                    {d.header.name || "YOUR NAME"}
+            <div style={{ position: "relative", marginBottom: "0.5em" }}>
+                <div style={{ textAlign: "center" }}>
+                    <div style={{ fontFamily: CM, fontSize: "var(--name-pt, 14pt)", fontWeight: "bold", textTransform: "uppercase", marginBottom: "2pt", color: "#000" }}>
+                        {d.header.name || "YOUR NAME"}
+                    </div>
+                    <div style={{ fontFamily: CM, fontSize: PT, color: "#000" }}>
+                        {[
+                            d.header.id,
+                            d.header.institution,
+                            d.header.linkedin && <a href={toAbsUrl(d.header.linkedin)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>linkedin</a>,
+                            d.header.github && <a href={toAbsUrl(d.header.github)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>github</a>
+                        ].filter(Boolean).map((item, idx, arr) => (
+                            <span key={idx}>
+                                {item}
+                                {idx < arr.length - 1 && " \u00A0|\u00A0 "}
+                            </span>
+                        ))}
+                    </div>
                 </div>
-                <div style={{ fontFamily: CM, fontSize: PT, color: "#000" }}>
-                    {[
-                        d.header.id,
-                        d.header.institution,
-                        d.header.linkedin && <a href={toAbsUrl(d.header.linkedin)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>linkedin</a>,
-                        d.header.github && <a href={toAbsUrl(d.header.github)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>github</a>
-                    ].filter(Boolean).map((item, idx, arr) => (
-                        <span key={idx}>
-                            {item}
-                            {idx < arr.length - 1 && " \u00A0|\u00A0 "}
-                        </span>
-                    ))}
+                <div style={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+                    <img src="/IIT_Madras_Logo_(Black_and_White).svg.png" alt="IIT Madras Logo" style={{ height: "45pt", width: "auto" }} />
                 </div>
             </div>
 
