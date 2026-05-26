@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react";
 import { useUser, useAuth, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
+import Template1 from "./templates/Template1";
+import Template2 from "./templates/Template2";
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct";
@@ -122,11 +124,6 @@ async function callPolish(text) {
     return d.choices[0].message.content.trim();
 }
 
-function BoldFirst({ text }) {
-    const idx = text.indexOf("—");
-    if (idx === -1) return <>{text}</>;
-    return <><strong>{text.slice(0, idx)}</strong>{"—" + text.slice(idx + 1)}</>;
-}
 
 const iBase = {
     width: "100%", padding: "5px 9px", border: "1px solid #2d3748",
@@ -217,209 +214,6 @@ function BulletRow({ value, onChange, onRemove, pKey, ps, setPs, rows = 2 }) {
     );
 }
 
-// ─── Resume Preview ───────────────────────────────────────────────────────────
-const CM = "'Computer Modern', 'CMU Serif', 'Latin Modern Roman', Georgia, 'Times New Roman', serif";
-const PT = "var(--pt, 9.5pt)";
-
-// ── Shared indent constants matching LaTeX \hspace{1em} and leftmargin=2.5em ──
-const INDENT = "1em";       // entry title left offset  (matches \hspace{1em})
-const BULLET_LEFT = "2.5em"; // bullet list left padding (matches leftmargin=2.5em)
-
-const secStyle = {
-    fontFamily: CM, fontSize: PT, fontWeight: "bold",
-    textTransform: "uppercase",
-    borderBottom: "0.5pt solid #000",
-    marginBottom: "0.42em", marginTop: "0.63em", paddingBottom: "0.1em",
-    letterSpacing: "0.2px", color: "#000",
-};
-
-// Shared <ul> style — identical for EVERY bullet list in the resume
-const ulStyle = {
-    margin: "0.21em 0 0.42em 0",
-    paddingLeft: BULLET_LEFT,
-    fontFamily: CM,
-    fontSize: PT,
-    lineHeight: 1.35,
-    color: "#000",
-    listStyleType: "disc",
-    textAlign: "left",
-};
-
-const liStyle = { marginBottom: "0.16em", paddingLeft: "0.1em" };
-
-function REntry({ title, period, isProject = false, github = "" }) {
-    return (
-        <div style={{
-            display: "flex", justifyContent: "space-between", alignItems: "baseline",
-            paddingLeft: INDENT, marginTop: "0.32em", marginBottom: "0pt",
-            fontFamily: CM, fontSize: PT, textAlign: "left",
-        }}>
-            <span style={{ fontWeight: "bold" }}>
-                {title}
-                {isProject && github && (
-                    <span style={{ fontWeight: "normal" }}>
-                        {" "}[<a href={toAbsUrl(github)} target="_blank" rel="noreferrer"
-                            style={{ color: "blue", textDecoration: "none" }}>GitHub</a>]
-                    </span>
-                )}
-            </span>
-            <span style={{ whiteSpace: "nowrap", marginLeft: "8pt", fontWeight: "normal" }}>{period}</span>
-        </div>
-    );
-}
-
-// Single bullet list renderer used everywhere
-function RBullets({ items, boldFirst = false }) {
-    const filtered = items.filter(Boolean);
-    if (!filtered.length) return null;
-    return (
-        <ul style={ulStyle}>
-            {filtered.map((b, i) => (
-                <li key={i} style={liStyle}>
-                    {boldFirst ? <BoldFirst text={b} /> : b}
-                </li>
-            ))}
-        </ul>
-    );
-}
-
-function Preview({ d }) {
-    const { skills } = d;
-    const hasSkills = skills.languages || skills.frameworks || skills.tools || skills.databases;
-
-    const [fontSize, setFontSize] = useState(9.5);
-    const containerRef = useRef(null);
-
-    useLayoutEffect(() => {
-        setFontSize(9.5);
-    }, [d]);
-
-    useLayoutEffect(() => {
-        if (!containerRef.current) return;
-        const el = containerRef.current;
-        if (el.scrollHeight > el.clientHeight && fontSize > 6) {
-            setFontSize(prev => parseFloat((prev - 0.1).toFixed(1)));
-        }
-    }, [fontSize, d]);
-
-    return (
-        <div id="resume-preview" ref={containerRef} style={{
-            "--pt": `${fontSize}pt`,
-            "--name-pt": `${fontSize * 1.47}pt`,
-            width: "210mm", height: "297mm",
-            padding: "0.45in 0.5in 0.38in 0.5in",
-            background: "white", color: "#000",
-            fontFamily: CM, fontSize: PT, lineHeight: 1.25,
-            boxSizing: "border-box",
-            textAlign: "left",
-            overflow: "hidden"
-        }}>
-
-            {/* ── Header ── */}
-            <div style={{ position: "relative", marginBottom: "0.42em" }}>
-                <div className="center" style={{ textAlign: "center" }}>
-                    <div style={{ fontFamily: CM, fontSize: "var(--name-pt, 14pt)", fontWeight: "bold", marginBottom: "0.21em", color: "#000" }}>
-                        {d.header.name || "YOUR NAME"}
-                    </div>
-                    <div style={{ fontFamily: CM, fontSize: PT, color: "#000" }}>
-                        {[
-                            d.header.id,
-                            d.header.institution,
-                            d.header.linkedin && <a href={toAbsUrl(d.header.linkedin)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>linkedin</a>,
-                            d.header.github && <a href={toAbsUrl(d.header.github)} target="_blank" rel="noreferrer" style={{ color: "#000", textDecoration: "none" }}>github</a>
-                        ].filter(Boolean).map((item, idx, arr) => (
-                            <span key={idx}>
-                                {item}
-                                {idx < arr.length - 1 && " \u00A0|\u00A0 "}
-                            </span>
-                        ))}
-                    </div>
-                </div>
-                <div style={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-                    <img src="/IIT_Madras_Logo_(Black_and_White).svg.png" alt="IIT Madras Logo" style={{ height: "45pt", width: "auto" }} />
-                </div>
-            </div>
-
-            {/* ── Education & Scholastic Achievements ── */}
-            <div style={secStyle}>Education &amp; Scholastic Achievements</div>
-            <div style={{ paddingLeft: INDENT }}>
-                <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: CM, fontSize: PT }}>
-                    <thead>
-                        <tr style={{ borderBottom: "0.5pt solid #000" }}>
-                            {["Program", "Institution", "CGPA / %", "Year"].map(h => (
-                                <th key={h} style={{ fontWeight: "bold", textAlign: "left", paddingBottom: "2pt", paddingRight: "8pt", color: "#000" }}>{h}</th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {d.education.map((e, i) => (
-                            <tr key={i}>
-                                {[e.program, e.institution, e.cgpa, e.year].map((v, j) => (
-                                    <td key={j} style={{ paddingTop: "2pt", paddingRight: "8pt", color: "#000" }}>{v}</td>
-                                ))}
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-            <RBullets items={d.achievements} boldFirst />
-
-            {/* ── Professional Experience ── */}
-            <div style={secStyle}>Professional Experience</div>
-            {d.experience.map((exp, i) => (
-                <div key={i}>
-                    <REntry title={exp.title} period={exp.period} />
-                    <RBullets items={exp.bullets} />
-                </div>
-            ))}
-
-            {/* ── Projects ── */}
-            <div style={secStyle}>Projects</div>
-            {d.projects.map((proj, i) => (
-                <div key={i}>
-                    <REntry title={proj.title} period={proj.period} isProject github={proj.github} />
-                    <RBullets items={proj.bullets} />
-                </div>
-            ))}
-
-            {/* ── Relevant Coursework ── */}
-            <div style={secStyle}>Relevant Coursework</div>
-            <ul style={{ ...ulStyle, margin: "2pt 0 4pt 0", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", columnGap: "0", rowGap: "1pt" }}>
-                {d.coursework.filter(Boolean).map((c, i) => (
-                    <li key={i} style={liStyle}>{c}</li>
-                ))}
-            </ul>
-
-            {/* ── Positions of Responsibility ── */}
-            <div style={secStyle}>Positions of Responsibility</div>
-            {d.positions.map((pos, i) => (
-                <div key={i}>
-                    <REntry title={pos.title} period={pos.period} />
-                    <RBullets items={pos.bullets} />
-                </div>
-            ))}
-
-            {/* ── Co-Curriculars & Extra-Curriculars ── */}
-            <div style={secStyle}>Co-Curriculars &amp; Extra-Curriculars</div>
-            <RBullets items={d.cocurricular} />
-
-            {/* ── Skills (optional) ── */}
-            {hasSkills && (
-                <>
-                    <div style={secStyle}>Skills</div>
-                    <ul style={ulStyle}>
-                        {skills.languages && <li style={liStyle}><strong>Languages:</strong> {skills.languages}</li>}
-                        {skills.frameworks && <li style={liStyle}><strong>Frameworks:</strong> {skills.frameworks}</li>}
-                        {skills.tools && <li style={liStyle}><strong>Tools:</strong> {skills.tools}</li>}
-                        {skills.databases && <li style={liStyle}><strong>Databases:</strong> {skills.databases}</li>}
-                    </ul>
-                </>
-            )}
-
-        </div>
-    );
-}
-
 function ProfileSync({ d, setD }) {
     const { user } = useUser();
     const { getToken } = useAuth();
@@ -486,6 +280,17 @@ function ProfileSync({ d, setD }) {
         }
     };
 
+    const safeParse = (str) => {
+        if (!str) return [];
+        if (typeof str !== 'string') return Array.isArray(str) ? str : [String(str)];
+        try {
+            const parsed = JSON.parse(str);
+            return Array.isArray(parsed) ? parsed : [str];
+        } catch (e) {
+            return [str];
+        }
+    };
+
     const handleLoad = async () => {
         setIsLoading(true);
         try {
@@ -508,7 +313,7 @@ function ProfileSync({ d, setD }) {
                 experience: profile.experiences?.length ? profile.experiences.map(exp => ({
                     title: exp.company && exp.role ? `${exp.company} — ${exp.role}` : (exp.company || exp.role || ""),
                     period: exp.startDate && exp.endDate ? `${exp.startDate} - ${exp.endDate}` : (exp.startDate || exp.endDate || ""),
-                    bullets: exp.description ? JSON.parse(exp.description) : []
+                    bullets: safeParse(exp.description)
                 })) : prev.experience,
                 education: profile.educations?.length ? profile.educations.map(edu => ({
                     program: edu.degree || edu.program || "",
@@ -521,13 +326,13 @@ function ProfileSync({ d, setD }) {
                     title: proj.name || "",
                     github: proj.github || "",
                     period: proj.startDate || proj.endDate || "",
-                    bullets: proj.description ? JSON.parse(proj.description) : []
+                    bullets: safeParse(proj.description)
                 })) : prev.projects,
                 coursework: profile.coursework?.length ? profile.coursework : prev.coursework,
                 positions: profile.responsibilities?.length ? profile.responsibilities.map(resp => ({
                     title: resp.name || "",
                     period: resp.startDate || resp.endDate || "",
-                    bullets: resp.description ? JSON.parse(resp.description) : []
+                    bullets: safeParse(resp.description)
                 })) : prev.positions,
                 cocurricular: profile.cocurriculars?.length ? profile.cocurriculars : prev.cocurricular,
                 skills: profile.skills || prev.skills
@@ -562,10 +367,28 @@ function ProfileSync({ d, setD }) {
 }
 
 // ─── Main App ─────────────────────────────────────────────────────────────────
+
+function BulletEditor({ bullets, sKey, ei, ps, setPs, updBullet, remBullet, addBullet }) {
+    return (
+        <div style={{ marginTop: 8 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.6px" }}>Bullets</div>
+            {bullets.map((b, bi) => (
+                <BulletRow key={bi}
+                    value={b} onChange={v => updBullet(sKey, ei, bi, v)}
+                    onRemove={() => remBullet(sKey, ei, bi)}
+                    pKey={`${sKey}-${ei}-${bi}`} ps={ps} setPs={setPs} rows={2}
+                />
+            ))}
+            <AddBtn onClick={() => addBullet(sKey, ei)} label="+ Add Bullet" />
+        </div>
+    );
+}
+
 export default function App() {
     const [d, setD] = useState(INIT);
     const [ps, setPs] = useState({});
     const [showForm, setShowForm] = useState(true);
+    const [selectedTemplate, setSelectedTemplate] = useState("template1");
 
     useEffect(() => {
         const link = document.createElement("link");
@@ -604,23 +427,6 @@ export default function App() {
     const remBullet = (key, i, bi) => updObj(key, i, { bullets: d[key][i].bullets.filter((_, j) => j !== bi) });
     const addBullet = (key, i) => updObj(key, i, { bullets: [...d[key][i].bullets, ""] });
 
-    function BulletEditor({ sKey, ei }) {
-        const bullets = d[sKey][ei].bullets;
-        return (
-            <div style={{ marginTop: 8 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.6px" }}>Bullets</div>
-                {bullets.map((b, bi) => (
-                    <BulletRow key={bi}
-                        value={b} onChange={v => updBullet(sKey, ei, bi, v)}
-                        onRemove={() => remBullet(sKey, ei, bi)}
-                        pKey={`${sKey}-${ei}-${bi}`} ps={ps} setPs={setPs} rows={2}
-                    />
-                ))}
-                <AddBtn onClick={() => addBullet(sKey, ei)} label="+ Add Bullet" />
-            </div>
-        );
-    }
-
     return (
         <div className="print-reset" style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
 
@@ -640,6 +446,14 @@ export default function App() {
                     <UserButton />
                 </SignedIn>
 
+                <select 
+                    value={selectedTemplate} 
+                    onChange={e => setSelectedTemplate(e.target.value)}
+                    style={{ padding: "6px 10px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                >
+                    <option value="template1">Template 1</option>
+                    <option value="template2">Template 2</option>
+                </select>
                 <button onClick={() => setShowForm(f => !f)} style={{ padding: "6px 14px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
                     {showForm ? "⊟ Hide Form" : "⊞ Show Form"}
                 </button>
@@ -693,7 +507,7 @@ export default function App() {
                                 <EntryBlock key={i} label={`Experience ${i + 1}`} onRemove={() => remItem("experience", i)}>
                                     <Inp label="Company — Role" value={exp.title} onChange={v => updObj("experience", i, { title: v })} />
                                     <Inp label="Period" value={exp.period} onChange={v => updObj("experience", i, { period: v })} />
-                                    <BulletEditor sKey="experience" ei={i} />
+                                    <BulletEditor bullets={exp.bullets} sKey="experience" ei={i} ps={ps} setPs={setPs} updBullet={updBullet} remBullet={remBullet} addBullet={addBullet} />
                                 </EntryBlock>
                             ))}
                             <AddBtn label="+ Add Experience" onClick={() => addItem("experience", { title: "", period: "", bullets: [""] })} />
@@ -705,7 +519,7 @@ export default function App() {
                                     <Inp label="Project Name" value={proj.title} onChange={v => updObj("projects", i, { title: v })} />
                                     <Inp label="GitHub URL" value={proj.github} onChange={v => updObj("projects", i, { github: v })} mono />
                                     <Inp label="Period" value={proj.period} onChange={v => updObj("projects", i, { period: v })} />
-                                    <BulletEditor sKey="projects" ei={i} />
+                                    <BulletEditor bullets={proj.bullets} sKey="projects" ei={i} ps={ps} setPs={setPs} updBullet={updBullet} remBullet={remBullet} addBullet={addBullet} />
                                 </EntryBlock>
                             ))}
                             <AddBtn label="+ Add Project" onClick={() => addItem("projects", { title: "", github: "", period: "", bullets: [""] })} />
@@ -729,7 +543,7 @@ export default function App() {
                                 <EntryBlock key={i} label={`Position ${i + 1}`} onRemove={() => remItem("positions", i)}>
                                     <Inp label="Title / Role" value={pos.title} onChange={v => updObj("positions", i, { title: v })} />
                                     <Inp label="Period" value={pos.period} onChange={v => updObj("positions", i, { period: v })} />
-                                    <BulletEditor sKey="positions" ei={i} />
+                                    <BulletEditor bullets={pos.bullets} sKey="positions" ei={i} ps={ps} setPs={setPs} updBullet={updBullet} remBullet={remBullet} addBullet={addBullet} />
                                 </EntryBlock>
                             ))}
                             <AddBtn label="+ Add Position" onClick={() => addItem("positions", { title: "", period: "", bullets: [""] })} />
@@ -760,7 +574,7 @@ export default function App() {
                 {/* ── Preview Panel ── */}
                 <div className="print-reset" style={{ flex: 1, background: "#1e2433", overflowY: "auto", display: "flex", justifyContent: "center", padding: 24, alignItems: "flex-start" }}>
                     <div className="print-reset" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.6)", flexShrink: 0 }}>
-                        <Preview d={d} />
+                        {selectedTemplate === "template1" ? <Template1 d={d} /> : <Template2 d={d} />}
                     </div>
                 </div>
 
