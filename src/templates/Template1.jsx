@@ -1,11 +1,12 @@
 import React, { useState, useRef, useLayoutEffect } from "react";
+import { formatText } from "../utils";
 
 const toAbsUrl = (url) => (!url || /^https?:\/\//i.test(url)) ? url : `https://${url}`;
 
 function BoldFirst({ text }) {
     const idx = text.indexOf("—");
-    if (idx === -1) return <>{text}</>;
-    return <><strong>{text.slice(0, idx)}</strong>{"—" + text.slice(idx + 1)}</>;
+    if (idx === -1) return <>{formatText(text)}</>;
+    return <><strong>{formatText(text.slice(0, idx))}</strong>{"—"}{formatText(text.slice(idx + 1))}</>;
 }
 
 // ─── Resume Preview ───────────────────────────────────────────────────────────
@@ -67,7 +68,7 @@ function RBullets({ items, boldFirst = false }) {
         <ul style={ulStyle}>
             {filtered.map((b, i) => (
                 <li key={i} style={liStyle}>
-                    {boldFirst ? <BoldFirst text={b} /> : b}
+                    {boldFirst ? <BoldFirst text={b} /> : formatText(b)}
                 </li>
             ))}
         </ul>
@@ -177,7 +178,7 @@ export default function Template1({ d }) {
             <div style={secStyle}>Relevant Coursework</div>
             <ul style={{ ...ulStyle, margin: "2pt 0 4pt 0", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", columnGap: "0", rowGap: "1pt" }}>
                 {d.coursework.filter(Boolean).map((c, i) => (
-                    <li key={i} style={liStyle}>{c}</li>
+                    <li key={i} style={liStyle}>{formatText(c)}</li>
                 ))}
             </ul>
 
@@ -199,10 +200,10 @@ export default function Template1({ d }) {
                 <>
                     <div style={secStyle}>Skills</div>
                     <ul style={ulStyle}>
-                        {skills.languages && <li style={liStyle}><strong>Languages:</strong> {skills.languages}</li>}
-                        {skills.frameworks && <li style={liStyle}><strong>Frameworks:</strong> {skills.frameworks}</li>}
-                        {skills.tools && <li style={liStyle}><strong>Tools:</strong> {skills.tools}</li>}
-                        {skills.databases && <li style={liStyle}><strong>Databases:</strong> {skills.databases}</li>}
+                        {skills.languages && <li style={liStyle}><strong>Languages:</strong> {formatText(skills.languages)}</li>}
+                        {skills.frameworks && <li style={liStyle}><strong>Frameworks:</strong> {formatText(skills.frameworks)}</li>}
+                        {skills.tools && <li style={liStyle}><strong>Tools:</strong> {formatText(skills.tools)}</li>}
+                        {skills.databases && <li style={liStyle}><strong>Databases:</strong> {formatText(skills.databases)}</li>}
                     </ul>
                 </>
             )}
