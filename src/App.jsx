@@ -469,6 +469,13 @@ export default function App() {
                 {showForm && (
                     <div className="no-print" style={{ width: 430, background: "#0d1424", borderRight: "1px solid #1e293b", overflowY: "auto", padding: "14px 14px 30px", flexShrink: 0 }}>
                         <ProfileSync d={d} setD={setD} />
+                        
+                        <div style={{ background: "rgba(124, 58, 237, 0.1)", border: "1px solid rgba(124, 58, 237, 0.3)", borderRadius: 8, padding: "10px 14px", marginBottom: 24 }}>
+                            <div style={{ fontSize: 12, color: "#c4b5fd", lineHeight: 1.5 }}>
+                                <strong>💡 Formatting Tip:</strong> You can use markdown! Use <code>**text**</code> for <strong>bold</strong> and <code>*text*</code> for <em>italics</em>.
+                            </div>
+                        </div>
+
                         <SCard title="Header">
                             <Inp label="Full Name" value={d.header.name} onChange={v => updH("name", v)} />
                             <Inp label="Roll / Student ID" value={d.header.id} onChange={v => updH("id", v)} />
