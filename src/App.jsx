@@ -427,49 +427,140 @@ export default function App() {
     const remBullet = (key, i, bi) => updObj(key, i, { bullets: d[key][i].bullets.filter((_, j) => j !== bi) });
     const addBullet = (key, i) => updObj(key, i, { bullets: [...d[key][i].bullets, ""] });
 
+    // ── Responsive: track viewport width ──────────────────────────────────────
+    const [vw, setVw] = useState(typeof window !== "undefined" ? window.innerWidth : 1200);
+    useEffect(() => {
+        const onResize = () => setVw(window.innerWidth);
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+    }, []);
+
+    const isMobile = vw < 768;
+    const isTablet = vw >= 768 && vw < 1100;
+
+    // Auto-hide form on mobile on first render
+    const didAutoHide = useRef(false);
+    useEffect(() => {
+        if (isMobile && !didAutoHide.current) {
+            setShowForm(false);
+            didAutoHide.current = true;
+        }
+    }, [isMobile]);
+
+    // ── Responsive: scale A4 preview to fit its container ─────────────────────
+    const previewContainerRef = useRef(null);
+    const [previewScale, setPreviewScale] = useState(1);
+    const A4_WIDTH_PX = 794; // 210mm at 96dpi
+    const A4_HEIGHT_PX = 1123; // 297mm at 96dpi
+
+    useEffect(() => {
+        const computeScale = () => {
+            if (!previewContainerRef.current) return;
+            const available = previewContainerRef.current.clientWidth - 48; // subtract 24px padding each side
+            const scale = Math.min(1, available / A4_WIDTH_PX);
+            setPreviewScale(scale);
+        };
+        computeScale();
+        const observer = new ResizeObserver(computeScale);
+        if (previewContainerRef.current) observer.observe(previewContainerRef.current);
+        return () => observer.disconnect();
+    }, [showForm]);
+
+    // Topbar button style helper
+    const tbBtn = (accent = false) => ({
+        padding: isMobile ? "5px 10px" : "6px 14px",
+        background: accent ? "#7c3aed" : "#1e293b",
+        color: accent ? "white" : "#94a3b8",
+        border: accent ? "none" : "1px solid #334155",
+        borderRadius: 6,
+        cursor: "pointer",
+        fontSize: isMobile ? 11 : 12,
+        fontWeight: accent ? 700 : 600,
+        whiteSpace: "nowrap",
+        flexShrink: 0,
+    });
+
     return (
-        <div className="print-reset" style={{ display: "flex", flexDirection: "column", height: "100vh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
+        <div className="print-reset" style={{ display: "flex", flexDirection: "column", height: "100svh", fontFamily: "system-ui, sans-serif", background: "#0a0f1a" }}>
 
             {/* ── Top Bar ── */}
-            <div className="no-print" style={{ display: "flex", alignItems: "center", gap: 12, padding: "9px 18px", background: "#060c18", borderBottom: "1px solid #1e293b", flexShrink: 0, zIndex: 10 }}>
-                <div style={{ fontWeight: 800, fontSize: 14, color: "#e2e8f0", letterSpacing: "-0.3px" }}>
+            <div className="no-print" style={{
+                display: "flex", alignItems: "center", gap: 8, padding: isMobile ? "8px 12px" : "9px 18px",
+                background: "#060c18", borderBottom: "1px solid #1e293b", flexShrink: 0, zIndex: 10,
+                flexWrap: isMobile ? "wrap" : "nowrap",
+            }}>
+                {/* Logo */}
+                <div style={{ fontWeight: 800, fontSize: isMobile ? 13 : 14, color: "#e2e8f0", letterSpacing: "-0.3px", flexShrink: 0 }}>
                     <span style={{ color: "#7c3aed" }}>▣</span> Resume-Chesuko
                 </div>
+
                 <div style={{ flex: 1 }} />
 
+                {/* Auth */}
                 <SignedOut>
                     <SignInButton mode="modal">
-                        <button style={{ padding: "6px 14px", background: "#7c3aed", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>Sign In</button>
+                        <button style={tbBtn(true)}>Sign In</button>
                     </SignInButton>
                 </SignedOut>
                 <SignedIn>
                     <UserButton />
                 </SignedIn>
 
-                <select 
-                    value={selectedTemplate} 
+                {/* Template selector */}
+                <select
+                    value={selectedTemplate}
                     onChange={e => setSelectedTemplate(e.target.value)}
-                    style={{ padding: "6px 10px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}
+                    style={{ padding: isMobile ? "5px 8px" : "6px 10px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: isMobile ? 11 : 12, fontWeight: 600 }}
                 >
                     <option value="template1">Template 1</option>
                     <option value="template2">Template 2</option>
                 </select>
-                <button onClick={() => setShowForm(f => !f)} style={{ padding: "6px 14px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 600 }}>
+
+                {/* Toggle form — always visible */}
+                <button onClick={() => setShowForm(f => !f)} style={tbBtn()}>
                     {showForm ? "⊟ Hide Form" : "⊞ Show Form"}
                 </button>
-                <button onClick={() => window.print()} style={{ padding: "7px 18px", background: "#7c3aed", color: "white", border: "none", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 700, letterSpacing: "0.2px" }}>
-                    ↓ Download PDF
+
+                {/* Download */}
+                <button onClick={() => window.print()} style={tbBtn(true)}>
+                    {isMobile ? "↓ PDF" : "↓ Download PDF"}
                 </button>
             </div>
 
             {/* ── Body ── */}
-            <div className="print-reset" style={{ flex: 1, display: "flex", overflow: "hidden" }}>
+            <div className="print-reset" style={{ flex: 1, display: "flex", overflow: "hidden", position: "relative" }}>
 
                 {/* ── Form Panel ── */}
                 {showForm && (
-                    <div className="no-print" style={{ width: 430, background: "#0d1424", borderRight: "1px solid #1e293b", overflowY: "auto", padding: "14px 14px 30px", flexShrink: 0 }}>
+                    <div
+                        className="no-print"
+                        style={{
+                            // Mobile: full-screen slide-over drawer; tablet: narrower sidebar; desktop: 430px
+                            position: isMobile ? "absolute" : "relative",
+                            inset: isMobile ? 0 : "auto",
+                            zIndex: isMobile ? 50 : "auto",
+                            width: isMobile ? "100%" : isTablet ? 340 : 430,
+                            background: "#0d1424",
+                            borderRight: isMobile ? "none" : "1px solid #1e293b",
+                            overflowY: "auto",
+                            padding: "14px 14px 30px",
+                            flexShrink: 0,
+                        }}
+                    >
+                        {/* Mobile close button */}
+                        {isMobile && (
+                            <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8, position: "sticky", top: 0, background: "#0d1424", zIndex: 1, paddingBottom: 4 }}>
+                                <button
+                                    onClick={() => setShowForm(false)}
+                                    style={{ padding: "5px 12px", background: "#1e293b", color: "#94a3b8", border: "1px solid #334155", borderRadius: 6, cursor: "pointer", fontSize: 12, fontWeight: 700 }}
+                                >
+                                    ✕ Close &amp; Preview
+                                </button>
+                            </div>
+                        )}
+
                         <ProfileSync d={d} setD={setD} />
-                        
+
                         <div style={{ background: "rgba(124, 58, 237, 0.1)", border: "1px solid rgba(124, 58, 237, 0.3)", borderRadius: 8, padding: "10px 14px", marginBottom: 24 }}>
                             <div style={{ fontSize: 12, color: "#c4b5fd", lineHeight: 1.5 }}>
                                 <strong>💡 Formatting Tip:</strong> You can use markdown! Use <code>**text**</code> for <strong>bold</strong> and <code>*text*</code> for <em>italics</em>.
@@ -578,9 +669,35 @@ export default function App() {
                     </div>
                 )}
 
+                {/* Mobile overlay backdrop — tap outside to close form */}
+                {isMobile && showForm && (
+                    <div
+                        className="no-print"
+                        onClick={() => setShowForm(false)}
+                        style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.55)", zIndex: 49, backdropFilter: "blur(2px)" }}
+                    />
+                )}
+
                 {/* ── Preview Panel ── */}
-                <div className="print-reset" style={{ flex: 1, background: "#1e2433", overflowY: "auto", display: "flex", justifyContent: "center", padding: 24, alignItems: "flex-start" }}>
-                    <div className="print-reset" style={{ boxShadow: "0 8px 40px rgba(0,0,0,0.6)", flexShrink: 0 }}>
+                <div
+                    ref={previewContainerRef}
+                    className="print-reset"
+                    style={{ flex: 1, background: "#1e2433", overflowY: "auto", overflowX: "hidden", display: "flex", justifyContent: "center", padding: 24, alignItems: "flex-start" }}
+                >
+                    {/* Scale wrapper: shrinks A4 to fit screen without affecting print dimensions */}
+                    <div
+                        className="print-reset"
+                        style={{
+                            boxShadow: "0 8px 40px rgba(0,0,0,0.6)",
+                            flexShrink: 0,
+                            transformOrigin: "top center",
+                            transform: `scale(${previewScale})`,
+                            // Pull up to remove the empty space left by scaling down
+                            marginBottom: previewScale < 1
+                                ? `${(previewScale - 1) * A4_HEIGHT_PX}px`
+                                : 0,
+                        }}
+                    >
                         {selectedTemplate === "template1" ? <Template1 d={d} /> : <Template2 d={d} />}
                     </div>
                 </div>
