@@ -157,43 +157,63 @@ export default function Template1({ d }) {
             <RBullets items={d.achievements} boldFirst />
 
             {/* ── Professional Experience ── */}
-            <div style={secStyle}>Professional Experience</div>
-            {d.experience.map((exp, i) => (
-                <div key={i}>
-                    <REntry title={exp.title} period={exp.period} />
-                    <RBullets items={exp.bullets} />
-                </div>
-            ))}
+            {d.experience?.length > 0 && (
+                <>
+                    <div style={secStyle}>Professional Experience</div>
+                    {d.experience.map((exp, i) => (
+                        <div key={i}>
+                            <REntry title={exp.title} period={exp.period} />
+                            <RBullets items={exp.bullets} />
+                        </div>
+                    ))}
+                </>
+            )}
 
             {/* ── Projects ── */}
-            <div style={secStyle}>Projects</div>
-            {d.projects.map((proj, i) => (
-                <div key={i}>
-                    <REntry title={proj.title} period={proj.period} isProject github={proj.github} />
-                    <RBullets items={proj.bullets} />
-                </div>
-            ))}
+            {d.projects?.length > 0 && (
+                <>
+                    <div style={secStyle}>Projects</div>
+                    {d.projects.map((proj, i) => (
+                        <div key={i}>
+                            <REntry title={proj.title} period={proj.period} isProject github={proj.github} />
+                            <RBullets items={proj.bullets} />
+                        </div>
+                    ))}
+                </>
+            )}
 
             {/* ── Relevant Coursework ── */}
-            <div style={secStyle}>Relevant Coursework</div>
-            <ul style={{ ...ulStyle, margin: "2pt 0 4pt 0", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", columnGap: "0", rowGap: "1pt" }}>
-                {d.coursework.filter(Boolean).map((c, i) => (
-                    <li key={i} style={liStyle}>{formatText(c)}</li>
-                ))}
-            </ul>
+            {d.coursework?.length > 0 && (
+                <>
+                    <div style={secStyle}>Relevant Coursework</div>
+                    <ul style={{ ...ulStyle, margin: "2pt 0 4pt 0", display: "grid", gridTemplateColumns: "1fr 1fr 1fr", columnGap: "0", rowGap: "1pt" }}>
+                        {d.coursework.filter(Boolean).map((c, i) => (
+                            <li key={i} style={liStyle}>{formatText(c)}</li>
+                        ))}
+                    </ul>
+                </>
+            )}
 
             {/* ── Positions of Responsibility ── */}
-            <div style={secStyle}>Positions of Responsibility</div>
-            {d.positions.map((pos, i) => (
-                <div key={i}>
-                    <REntry title={pos.title} period={pos.period} />
-                    <RBullets items={pos.bullets} />
-                </div>
-            ))}
+            {d.positions?.length > 0 && (
+                <>
+                    <div style={secStyle}>Positions of Responsibility</div>
+                    {d.positions.map((pos, i) => (
+                        <div key={i}>
+                            <REntry title={pos.title} period={pos.period} />
+                            <RBullets items={pos.bullets} />
+                        </div>
+                    ))}
+                </>
+            )}
 
             {/* ── Co-Curriculars & Extra-Curriculars ── */}
-            <div style={secStyle}>Co-Curriculars &amp; Extra-Curriculars</div>
-            <RBullets items={d.cocurricular} />
+            {d.cocurricular?.length > 0 && (
+                <>
+                    <div style={secStyle}>Co-Curriculars &amp; Extra-Curriculars</div>
+                    <RBullets items={d.cocurricular} />
+                </>
+            )}
 
             {/* ── Skills (optional) ── */}
             {hasSkills && (
