@@ -117,9 +117,11 @@ export default function Template2({ d }) {
                         ))}
                     </div>
                 </div>
-                <div style={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
-                    <img src="/IIT_Madras_Logo_(Black_and_White).svg.png" alt="IIT Madras Logo" style={{ height: "45pt", width: "auto" }} />
-                </div>
+                {import.meta.env.VITE_APP_VARIANT !== 'GENERAL' && (
+                    <div style={{ position: "absolute", right: 0, top: "50%", transform: "translateY(-50%)" }}>
+                        <img src="/IIT_Madras_Logo_(Black_and_White).svg.png" alt="IIT Madras Logo" style={{ height: "45pt", width: "auto" }} />
+                    </div>
+                )}
             </div>
 
             {/* ── Education ── */}
