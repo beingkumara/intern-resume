@@ -1,4 +1,4 @@
-import React, { useState, useRef, useLayoutEffect } from "react";
+import React from "react";
 import { formatText } from "../utils";
 
 const toAbsUrl = (url) => (!url || /^https?:\/\//i.test(url)) ? url : `https://${url}`;
@@ -68,26 +68,11 @@ export default function Template2({ d }) {
     const { skills } = d;
     const hasSkills = skills.languages || skills.frameworks || skills.tools || skills.databases;
 
-    const [fontSize, setFontSize] = useState(10);
-    const containerRef = useRef(null);
-
-    useLayoutEffect(() => {
-        setFontSize(10);
-    }, [d]);
-
-    useLayoutEffect(() => {
-        if (!containerRef.current) return;
-        const el = containerRef.current;
-        if (el.scrollHeight > el.clientHeight && fontSize > 6) {
-            setFontSize(prev => parseFloat((prev - 0.1).toFixed(1)));
-        }
-    }, [fontSize, d]);
-
     return (
-        <div id="resume-preview" ref={containerRef} style={{
-            "--pt": `${fontSize}pt`,
-            "--sec-pt": `${fontSize * 1.1}pt`,
-            "--name-pt": `${fontSize * 1.4}pt`,
+        <div id="resume-preview" style={{
+            "--pt": "10pt",
+            "--sec-pt": "11pt",
+            "--name-pt": "14pt",
             width: "210mm", height: "297mm",
             padding: "0.4in 0.4in 0.4in 0.4in",
             background: "white", color: "#000",

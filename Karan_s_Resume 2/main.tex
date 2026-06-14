@@ -1,0 +1,430 @@
+%-------------------------
+% Resume in Latex
+% Author : Karan Agrawal
+%-------------------------
+\documentclass[10pt,a4paper,withhyper]{altacv}
+
+% Page geometry
+\geometry{
+  left=0.8cm,
+  right=0.8cm,
+  top=0.8cm,
+  bottom=0.8cm,
+  columnsep=0.3cm
+}
+
+% Packages
+\usepackage{paracol}
+\usepackage{multicol}
+\usepackage{enumitem}
+\usepackage{ifthen}
+\usepackage{datetime} % For date parts like \day, \month, \year
+\newdateformat{ddmmyy}{\twodigit{\day}\twodigit{\month}\twodigit{\year}}
+
+% List settings
+\setlength{\columnsep}{0.5cm}
+\setlist[itemize]{itemsep=0.02mm, parsep=2pt, topsep=2pt}
+
+% Fonts
+\ifxetexorluatex
+  \setmainfont{Lato}
+\else
+  \usepackage[default]{lato}
+\fi
+
+% Colors
+\definecolor{DeepNavy}{HTML}{023e7d}
+\definecolor{DarkGrey}{HTML}{333333}
+\definecolor{MediumGrey}{HTML}{555555}
+\definecolor{black}{HTML}{000000}
+
+% Color aliases
+\colorlet{tagline}{DeepNavy}
+\colorlet{heading}{DeepNavy}
+\colorlet{headingrule}{DeepNavy}
+\colorlet{accent}{DeepNavy}
+\colorlet{emphasis}{DarkGrey}
+\colorlet{body}{black}
+
+
+
+% Markers
+\renewcommand{\itemmarker}{{\small\textbullet}}
+\renewcommand{\ratingmarker}{\faCircle}
+
+
+
+
+% Consistent spacing definitions
+\newcommand{\sectionspace}{\vspace{-0.35cm}}
+\newcommand{\subsectionspace}{\vspace{-0.45cm}}
+\newcommand{\itemspace}{\vspace{-0.3cm}}
+\newcommand{\headerspace}{\vspace{-0.28cm}}
+\newboolean{off}
+\setboolean{off}{false}
+\newboolean{ml}
+\setboolean{ml}{false}
+
+
+
+
+
+
+
+% Course Projects
+\newcommand{\ProjectConvolution}{
+\cvevent{}{\textbf{Parallel Convolution Engine using CUDA} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{CS6023: GPU Programming | Prof. Rupesh Nasre | Team (1)}}
+\begin{adjustwidth}{1em}{0pt} \small
+    Implemented a \textbf{CUDA-optimized convolution kernel} for large-scale matrix operations, achieving good performance gain over sequential execution. Focused on \textbf{shared memory usage} and \textbf{thread-level parallelism}.
+
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectMST}{
+\cvevent{}{\textbf{GPU-Accelerated Minimum Spanning Tree} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{CS6023: GPU Programming | Prof. Rupesh Nasre | Team (1)}}
+\begin{adjustwidth}{1em}{0pt} \small
+    Designed a \textbf{parallel MST algorithm} using \textbf{Borůvka’s approach in CUDA}, optimized for large sparse graphs. Achieved significant runtime reduction by exploiting \textbf{massive parallelism} and memory-efficient graph representation.
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectCNN}{
+\cvevent{}{\textbf{Image Classification on iNaturalist} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{DA6401: Introduction to Deep Learning | Prof. Mitesh Khapra | Team (2)}}
+\begin{adjustwidth}{1em}{0pt} \small
+    Implemented \textbf{custom CNN architectures} with configurable hyperparameters and \textbf{transfer learning} using \textbf{EfficientNetV2} on the large-scale \textbf{iNaturalist 12K dataset}. Explored training strategies, data augmentation, and \textbf{gradient-efficient optimization}, achieving strong trade-off between \textbf{accuracy and computational efficiency}.
+\end{adjustwidth}
+}
+
+
+\newcommand{\ProjectTranslitertion}{
+\cvevent{}{\textbf{Neural Transliteration System} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{DA6401: Introduction to Deep Learning | Prof. Mitesh Khapra | Team (1)}}
+\begin{adjustwidth}{1em}{0pt} \small
+     Developed an \textbf{encoder–decoder architecture} for English–Hindi transliteration using \textbf{RNN, LSTM, and GRU}. Enhanced performance with an \textbf{attention mechanism} and systematic hyperparameter experiments.
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectNLP}{
+\cvevent{}{\textbf{Search Engine from Scratch} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{CS6370: NLP | Prof. Sutanu Chakraborti | Team (4)}} \small
+\begin{adjustwidth}{1em}{0pt} \small
+    Implemented a full \textbf{information retrieval pipeline} with preprocessing, indexing, and vector-space ranking. Benchmarked against \textbf{TF–IDF} baseline and explored \textbf{Word2Vec, GloVe, BERT, and LSI} for improved retrieval quality.
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectDApp}{
+\cvevent{}{Decentralized Land Registry System \hfill \textit{\small{Jan '25 - May '25}}}{}{}
+{\headerspace \small \textit{CS6858: Distributed Trust | Prof. John Augustine | Team (3)}}
+\begin{adjustwidth}{1em}{0pt} \small
+    Built a \textbf{blockchain-based land registry system} ensuring secure and tamper-proof property records. Implemented \textbf{smart contracts in Solidity}, a \textbf{React.js} interface, and leveraged \textbf{Hedera Hashgraph} for scalable consensus and transaction logging.
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectPRML}{
+\cvevent{}{\textbf{Classical Machine Learning Techniques} \hfill \textit{\small{Jul '24 -- Nov '24}}}{}{}
+{\headerspace \small \textit{CS5691: Pattern Recognition \& ML | Prof. C. Chandra Sekhar | Team (2)}}
+\begin{adjustwidth}{1em}{0pt} \small
+    Implemented and analyzed \textbf{KNN, GMM, SVM, and Feedforward NN} for classification tasks. Applied \textbf{PCA} for dimensionality reduction and feature extraction across multiple datasets.
+\end{adjustwidth}
+}
+
+\newcommand{\ProjectMLFFNN}{
+\cvevent{}{\textbf{Neural Network Implementation} \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\headerspace \small \textit{DA6401: Introduction to Deep Learning | Prof. Mitesh Khapra | Team (1)}}
+
+\begin{adjustwidth}{1em}{0pt}
+    Built a \textit{feedforward neural network} from scratch with full \textit{backpropagation} support and implemented optimizers including \textit{SGD}, \textit{Momentum}, \textit{Nesterov}, \textit{RMSProp}, \textit{Adam}, and \textit{Nadam}. Trained and evaluated the model on both \textit{MNIST} and \textit{Fashion-MNIST} datasets, with hyperparameter tuning conducted via \textit{wandb.ai}.  
+\end{adjustwidth}
+}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% HEADER %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\setboolean{off}{false}
+\ifthenelse{\boolean{off}}{%
+  %%%%%%%%%%%%%% IF offcampus HEADER %%%%%%%%%%%%%%%
+  \vspace{-10mm}
+  \name{Karan Agrawal}
+  \vspace{-6mm}
+  \tagline{\fontsize{12pt}{12pt}\selectfont \faEnvelope\!\href{mailto:karan757527@gmail.com}{ karan757527@gmail.com}}
+  \vspace{-4mm}
+  
+  \personalinfo{\normalsize
+     \faMobile\! +91 9828757527 \hspace{.5mm}
+     \faGithub\!\href{https://github.com/karan757527}{karan757527} \hspace{.5mm}
+     \faLinkedin\!\href{https://www.linkedin.com/in/agrawalkaran}{agrawalkaran}\\ \vspace{1.25mm}
+  }
+}{%
+  %%%%%%%%%%%%%% ELSE HEADER %%%%%%%%%%%%%%%
+  \noindent
+  \hfill
+  \begin{minipage}{0.3\textwidth}
+    \raggedleft
+    \includegraphics[height=2.0cm]{iitmLogo.png}
+  \end{minipage}
+
+  \vspace{-10mm}
+  \name{Karan Agrawal}
+  \vspace{-6mm}
+  \tagline{\fontsize{12.6pt}{12pt}\selectfont Indian Institute of Technology Madras}
+  \vspace{-4mm}
+  \personalinfo{\normalsize
+     \href{https://www.cse.iitm.ac.in/profile.php?arg=MzIxMw==}{CS24M021} \hspace{.5mm}
+     \faGithub\!\href{https://github.com/karan757527}{karan757527} \hspace{.5mm}
+     \faLinkedin\!\href{https://www.linkedin.com/in/agrawalkaran}{agrawalkaran}
+  }
+}
+
+
+
+
+\makecvheader
+\AtBeginEnvironment{itemize}{\small}
+\columnratio{0.50}
+\itemspace
+
+\begin{paracol}{2}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% EDUCATION %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Education}}
+\vspace{-1mm}
+
+\cveventd{IIT Madras, Chennai}
+          {\small M.Tech - Computer Science \& Engineering}
+          {CGPA: 8.86/10}
+          {2026}
+\subsectionspace
+\divider
+\itemspace
+
+\cveventd{Arya College of Engg. \& IT, Jaipur}
+          {\small B.Tech - Computer Science \& Engineering}
+          {CGPA: 8.46/10}
+          {2022}
+\subsectionspace
+\divider
+\itemspace
+
+\cveventd{SN International Academy, Danta (Sikar) \hspace{-1cm}}
+          {\small XII - CBSE}
+          {Percentage: 81.60\%}
+          {2018}
+\subsectionspace
+\divider
+\itemspace
+
+\cveventd{SAVM Sr. Sec. School, Shrimadhopur (Sikar) \hspace{-1.5cm}}
+          {\small X - RBSE}
+          {Percentage: 83.33\%}
+          {2016}
+\subsectionspace
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% PROFESSIONAL EXPERIENCE %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Professional Experience}}
+\itemspace
+
+\cvevent{}{\textbf{\large Nutanix, Inc.}\\
+MTS Intern \hfill \textit{\small{May '25 -- July '25}}}{}{}
+
+
+{\vspace{-0.2cm} \textbf{\textit{Distributed Systems Reliability Engineering – Files Team}}}
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Enhanced reliability and Optimized critical configurations} of Apache Zookeeper in Nutanix Files by analyzing failover behavior, leader election, and quorum management under failure scenarios. 
+  \item \textbf{Conducted large-scale fault injection experiments} (CVM shutdowns, I/O stalls, network disruptions) to evaluate recovery timelines and service stability.   
+  \item \textbf{Identified and filed bugs in core Zookeeper protocol}, including issues with leader re-election and follower freezes, leading to fixes that improved cluster stability.  
+  \item \textbf{Collaborated with cross-functional R\&D teams} to propose design improvements, improve failure detection mechanisms, and ensure high availability in production-scale distributed systems.  
+\end{itemize}
+
+\ifthenelse{\boolean{ml}}{
+
+\itemspace
+}{%
+\sectionspace
+\divider
+\sectionspace
+
+\cvevent{}{\textbf{\large Grras Solutions Pvt Ltd}\\
+AWS Solution Architect Associate Intern \hfill \textit{\small{July '21 -- Aug '21}}}{}{}
+
+
+{\vspace{-0.2cm} \textbf{\textit{Cloud Infrastructure \& AWS Solutions}}}
+
+\begin{itemize}[noitemsep]
+  \item \textbf{Designed and deployed scalable cloud solutions} using AWS services (EC2, S3, RDS, VPC), ensuring high availability and performance for applications.  
+  \item \textbf{Automated infrastructure management} with AWS Lambda and CloudFormation, while strengthening security via IAM policies, monitoring with CloudWatch, and enforcing best practices for compliance.  
+\end{itemize}
+
+\itemspace
+}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%% KEY PROJECTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Key Projects}}
+\itemspace
+
+\cvevent{}{Practical Subgraph Learning for Anti-Money-Laundering on Blockchain Graphs \hfill \textit{\small{Jan '26 – May '26}}}{}{}
+{\vspace{-0.28cm} \small \textit{\textbf{M.Tech Project | Guide: Dr.\ John Augustine, CSE Dept., IIT Madras}}\\
+\small \textit{\textbf{Technologies}: Graph Neural Networks, Subgraph Representation Learning, GLASS, Neighbourhood Sampling, Blockchain Analytics}}
+\begin{itemize}[noitemsep]
+  \item Engineered a per-batch CSR-based sampler for the GLASS framework on the 49M-node Elliptic2 Bitcoin graph, cutting peak GPU memory by two orders of magnitude (\textasciitilde 0.09~GB) and enabling fixed-width architecture sweeps on a single 32~GB V100.
+  \item Characterised three neighbour-sampling strategies (per-source NeighborSampler, GraphSAINT-RW, 1-hop EgoNet) on four GLASS synthetic benchmarks; established per-source sampling as the structurally safe choice for disconnected target subgraphs.
+  \item Designed and ran a 12-cell, 7-seed (84 GPU runs) controlled ablation isolating four factors --- node features, depth, normalisation, fanout --- with Welch's $t$-test on every comparison; quantified per-axis effects and uncovered a multi-factor interaction.
+  \item Resolved the four-fold published PR-AUC gap (0.208 vs 0.816) on Elliptic2 into one dominant feature-handling decision, two memory-economy artefacts, and one interaction-bound normalisation choice; identified two qualitatively distinct configurations reaching PR-AUC \textasciitilde 0.88 within the pipeline.
+\end{itemize}
+
+\ifthenelse{\boolean{ml}}{%
+\sectionspace
+\divider
+\sectionspace
+
+\cvevent{}{Fake News Classifier \hfill \textit{\small{Jan '25 -- May '25}}}{}{}
+{\vspace{-0.28cm}\small \textit{\textbf{Technologies}: Python, Scikit-learn, NLP, TF--IDF, Logistic Regression, SVM, Naive Bayes, Random Forest}}
+\begin{itemize}[noitemsep]
+    \item Implemented a \textbf{text classification pipeline} on the LIAR benchmark dataset with preprocessing (tokenization, stemming) and features (bag-of-words, n-grams, TF--IDF).
+    \item Trained and compared \textbf{Logistic Regression, Linear SVM, Naive Bayes, Random Forest, SGD} with hyperparameter tuning via GridSearchCV.
+    \item Achieved an \textbf{F1 score of ~73\%}, with Logistic Regression outperforming other models.
+    \item Deployed the optimized model as a \textbf{prediction script}, classifying headlines into \textit{True/False} with probability estimates.
+\end{itemize}
+\switchcolumn
+\vspace{0.9mm}
+}{
+\switchcolumn
+
+}
+
+
+
+
+
+%\itemspace
+
+
+
+
+%\vspace{-0.9mm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COURSE PROJECTS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% ==================== Projects to Display ====================
+
+% \ProjectConvolution
+% \ProjectMST
+% \ProjectCNN
+% \ProjectTransz
+% \ProjectNLP
+% \ProjectDApp
+% \ProjectPRML
+
+%%% =============================================================
+
+\ifthenelse{\boolean{ml}}{%
+  % -------- IF ml = true --------
+  \cvsection{\Large{Course Projects}}
+  \itemspace
+
+  \ProjectTranslitertion
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectConvolution
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectNLP
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectMLFFNN
+
+  \itemspace
+}{%
+  % -------- ELSE -------- sde
+  \cvsection{\Large{Course Projects}}
+  \itemspace
+
+  \ProjectConvolution
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectMST
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectDApp
+
+  \itemspace
+  \divider
+  \sectionspace
+
+  \ProjectTranslitertion
+
+  \itemspace
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% COURSEWORK %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Coursework}}
+\vspace{-0.2cm}
+\begin{itemize}[noitemsep]
+    \item \textbf{Theory \& Foundations:} Advanced Data Structures \& Algorithms, Analysis of Algorithms, Object Oriented Programming, Linear Algebra \& Random Processes, Theory of Computation, Discrete Mathematics
+    \item \textbf{Systems:} Operating Systems, Computer Organization and Architecture, Computer Networks, Database Management Systems, Distributed Trust
+    \item \textbf{Programming:} Advanced Programming Lab, GPU Programming, Object Oriented Programming
+    \item \textbf{Machine Learning \& AI:} Introduction to Deep Learning, Natural Language Processing, Pattern Recognition \& Machine Learning
+\end{itemize}
+\itemspace
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SKILLS %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Skills}}
+\vspace{-0.2cm}
+\begin{itemize}[noitemsep]
+    \item \textbf{Programming:} C, C++, Python, CUDA, SQL, Solidity
+    \item \textbf{Libraries:} PyTorch, NumPy, Pandas, Scikit-learn, Matplotlib, NLTK
+    \item \textbf{Tools \& Platforms:} Apache Zookeeper, AWS, WandB, Git, MongoDB, PostgreSQL, Truffle, Ganache, Hedera Hashgraph SDK
+\end{itemize}
+\sectionspace
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% SCHOLASTIC ACHIEVEMENTS %%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Scholastic Achievements}}
+\vspace{-0.2cm}
+\begin{itemize}[noitemsep]
+    \item Achieved \textbf{All India Rank 102} in \textbf{GATE 2024 – Computer Science} among 1,23,967 candidates.
+    \item Achieved \textbf{All India Rank 336} in \textbf{GATE 2024 – Data Science \& AI} among 39,210 candidates.
+    \item Completed \textbf{NPTEL Domain Certification in Programming (Computer Science)} by successfully finishing 7 NPTEL courses during April 2022.
+\end{itemize}
+\itemspace
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% POSITIONS OF RESPONSIBILITY %%%%%%%%%%%%%%%%%%%%%%%%%%
+\cvsection{\Large{Positions of Responsibility}}
+\vspace{-0.2cm}
+\begin{itemize}[noitemsep]
+    \item \textbf{Placement Coordinator, CS M.Tech – Training and Placement Team, IIT Madras}
+    \item \textbf{Teaching Assistant, IIT Madras} – CS6370: Natural Language Processing, CS5800: Advanced Data Structures \& Algorithms, CS2810: Object-Oriented Algorithms Implementation and Analysis Lab, CS1111: Problem Solving Using Computers
+\end{itemize}
+
+
+
+
+\end{paracol}
+\end{document}

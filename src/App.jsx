@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useLayoutEffect } from "react
 import { useUser, useAuth, SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 import Template1 from "./templates/Template1";
 import Template2 from "./templates/Template2";
+import Template3 from "./templates/Template3";
 
 const HF_URL = "https://router.huggingface.co/v1/chat/completions";
 const HF_MODEL = "Qwen/Qwen2.5-72B-Instruct";
@@ -270,7 +271,14 @@ function ProfileSync({ d, setD }) {
                     skills: d.skills
                 })
             });
-            if (!res.ok) throw new Error("Failed to save profile");
+            const saveContentType = res.headers.get("content-type") || "";
+            if (!res.ok || !saveContentType.includes("application/json")) {
+                throw new Error(
+                    res.ok
+                        ? "API server not running. In a second terminal run: npm run dev:api"
+                        : `Failed to save profile (HTTP ${res.status})`
+                );
+            }
             alert("Master Profile saved successfully!");
         } catch (e) {
             console.error(e);
@@ -298,7 +306,15 @@ function ProfileSync({ d, setD }) {
             const res = await fetch("/api/profile", {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            if (!res.ok) throw new Error("Failed to load profile");
+            if (!res.ok) throw new Error(`Failed to load profile (HTTP ${res.status})`);
+            const contentType = res.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                throw new Error(
+                    "API server is not running locally.\n\n" +
+                    "In a second terminal, run:\n  npm run dev:api\n\n" +
+                    "(This starts vercel dev on port 3000 so /api/* routes work.)"
+                );
+            }
             const profile = await res.json();
 
             setD(prev => ({
@@ -514,6 +530,7 @@ export default function App() {
                 >
                     <option value="template1">Template 1</option>
                     <option value="template2">Template 2</option>
+                    <option value="template3">Template 3 (AltaCV)</option>
 
                 </select>
 
@@ -699,7 +716,7 @@ export default function App() {
                                 : 0,
                         }}
                     >
-                        {selectedTemplate === "template1" ? <Template1 d={d} /> : <Template2 d={d} />}
+                        {selectedTemplate === "template1" ? <Template1 d={d} /> : selectedTemplate === "template2" ? <Template2 d={d} /> : <Template3 d={d} />}
                     </div>
                 </div>
 
